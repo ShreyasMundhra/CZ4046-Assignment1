@@ -1,6 +1,9 @@
+package iterators;
 import java.util.ArrayList;
-import Action;
-import Plotter;
+
+import util.Action;
+import util.Environment;
+import util.Plotter;
 
 public class ValueIteration implements Environment{
 	private double[][] utilities;
@@ -66,18 +69,7 @@ public class ValueIteration implements Environment{
 	private void findPolicy(){
 		for(int i = 0; i < 6; i++){
 			for(int j = 0; j < 6; j++){
-				if(maze[i][j] == WALL){
-					continue;
-				}
 				policy[i][j] = findBestAction(i,j).symbol;
-//				if(bestAction == GO_NORTH)
-//					policy[i][j] = '^';
-//				else if(bestAction == GO_SOUTH)
-//					policy[i][j] = 'v';
-//				else if(bestAction == GO_EAST)
-//					policy[i][j] = '>';
-//				else
-//					policy[i][j] = '<';
 			}
 		}
 	}

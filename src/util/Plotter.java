@@ -1,3 +1,4 @@
+package util;
 import java.awt.*;
 import java.awt.font.*;
 import java.awt.geom.*;
@@ -14,7 +15,7 @@ public class Plotter extends JPanel {
     	repaint();
     }
     
-    protected void drawGraph(){
+    public void drawGraph(){
     	JFrame f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.add(this);

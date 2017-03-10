@@ -1,3 +1,4 @@
+package util;
 public class Action {
 	public double northProb;
 	public double southProb;

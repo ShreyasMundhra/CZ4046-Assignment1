@@ -1,6 +1,11 @@
+package iterators;
 import java.util.ArrayList;
 
 import javax.swing.text.Utilities;
+
+import util.Action;
+import util.Environment;
+import util.Plotter;
 
 public class PolicyIteration implements Environment{
 	private Action[][] policy;
