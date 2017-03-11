@@ -1,17 +1,10 @@
 package util;
 public class Action {
-	public double northProb;
-	public double southProb;
-	public double eastProb;
-	public double westProb;
-	public char symbol;
-
-//	public Action(double northProb, double southProb, double eastProb, double westProb) {
-//		this.northProb = northProb;
-//		this.southProb = southProb;
-//		this.eastProb = eastProb;
-//		this.westProb = westProb;
-//	}
+	private double northProb;
+	private double southProb;
+	private double eastProb;
+	private double westProb;
+	private char symbol;
 	
 	public Action(double northProb, double southProb, double eastProb, double westProb, char symbol) {
 		this(symbol);
@@ -28,4 +21,24 @@ public class Action {
 	public Action(){
 		this('W');
 	}
+
+	public double getNorthProb() {
+		return northProb;
+	}
+
+	public double getSouthProb() {
+		return southProb;
+	}
+
+	public double getEastProb() {
+		return eastProb;
+	}
+
+	public double getWestProb() {
+		return westProb;
+	}
+	
+	public char getSymbol() {
+		return symbol;
+	}	
 }

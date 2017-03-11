@@ -1,11 +1,10 @@
 package iterators;
 import java.util.ArrayList;
 
-import javax.swing.text.Utilities;
-
 import util.Action;
 import util.Environment;
 import util.Plotter;
+import util.UIHelper;
 
 public class PolicyIteration implements Environment{
 	private Action[][] policy;
@@ -17,7 +16,7 @@ public class PolicyIteration implements Environment{
 		for(int i = 0; i < 6; i++){
 			for(int j = 0; j < 6; j++){
 				if(maze[i][j] == WALL)
-					continue;
+					policy[i][j] = new Action();
 				policy[i][j] = GO_NORTH;
 			}
 		}
@@ -27,13 +26,13 @@ public class PolicyIteration implements Environment{
 	}
 	
 	public void doPolicyIteration(){
-		int epoch = 1;
+		int epoch = 0;
 		double[][] newUtilities = new double[6][6];
 		double deltaMax;
 		
 		do{
 			deltaMax = 0;
-			System.out.println("Epoch: " + epoch);
+//			System.out.println("Epoch: " + epoch);
 			utilityVsIter.add(utilities[0][0]);
 			for(int i = 0; i < 6; i++){
 				for(int j = 0; j < 6; j++){
@@ -56,20 +55,25 @@ public class PolicyIteration implements Environment{
 			findPolicy();			
 			epoch += 1;
 		} while(deltaMax >= epsilon*(1-gamma)/gamma);
+		
+		System.out.println("Number of iterations: " + epoch);
 	}
 	
 	private void findPolicy(){
 		for(int i = 0; i < 6; i++){
 			for(int j = 0; j < 6; j++){
-				if(maze[i][j] == WALL){
-					continue;
-				}
+//				if(maze[i][j] == WALL){
+//					continue;
+//				}
 				policy[i][j] = findBestAction(i,j);
 			}
 		}
 	}
 	
 	private Action findBestAction(int i, int j){
+		if(maze[i][j] == WALL)
+			return new Action();
+		
 		double northUtility = findUtility(i,j,GO_NORTH);
 		double westUtility = findUtility(i,j,GO_WEST);
 		double eastUtility = findUtility(i,j,GO_EAST);
@@ -90,10 +94,10 @@ public class PolicyIteration implements Environment{
 	}
 	
 	private double findUtility(int i, int j, Action action) {
-		double northProb = action.northProb;
-		double westProb = action.westProb;
-		double eastProb = action.eastProb;
-		double southProb = action.southProb;
+		double northProb = action.getNorthProb();
+		double westProb = action.getWestProb();
+		double eastProb = action.getEastProb();
+		double southProb = action.getSouthProb();
 		
 		double northUtility;
 		double westUtility;
@@ -124,35 +128,19 @@ public class PolicyIteration implements Environment{
 		double expectedUtility = northUtility*northProb + westUtility*westProb + eastUtility*eastProb + southUtility*southProb;
 		return expectedUtility;
 	}
-
-	private void displayAction(Action action){
-		if(action == GO_NORTH)
-			System.out.print("N");
-		else if(action == GO_SOUTH)
-			System.out.print("S");
-		else if(action == GO_EAST)
-			System.out.print("E");
-		else if(action == GO_WEST)
-			System.out.print("W");
-	}
 	
 	public static void main(String[] args) {
 		PolicyIteration policyIter = new PolicyIteration();
 		policyIter.doPolicyIteration();
 		
-		for(int i = 0; i < 6; i++){
-			for(int j = 0; j < 6; j++){
-				System.out.print(policyIter.utilities[i][j] + ",");
-			}
-			System.out.println();
-		}
-		for(int i = 0; i < 6; i++){
-			for(int j = 0; j < 6; j++){
-				policyIter.displayAction(policyIter.policy[i][j]);
-				System.out.print(",");
-			}
-			System.out.println();
-		}
+		UIHelper.displayUtilities(policyIter.utilities);
+		
+		System.out.println("Utilities: ");
+		UIHelper.displayUtilitiesGrid(policyIter.utilities);
+		
+		System.out.println("Policy: ");
+		policyIter.findPolicy();
+		UIHelper.displayPolicy(policyIter.policy);
 		
 		Plotter plotter = new Plotter(policyIter.utilityVsIter);
 		plotter.drawGraph();

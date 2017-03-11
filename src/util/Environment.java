@@ -1,15 +1,6 @@
 package util;
 
-public interface Environment {
-	public class Cell {
-		public int color;
-		public double reward;
-		public Cell(int color, double reward) {
-			this.color = color;
-			this.reward = reward;
-		}		
-	}
-	
+public interface Environment {	
 	public static Cell WALL = new Cell(1,0);
 	public static Cell WHITE = new Cell(2,-0.04);
 	public static Cell ORANGE = new Cell(3,-1);

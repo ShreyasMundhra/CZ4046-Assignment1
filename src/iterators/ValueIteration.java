@@ -4,21 +4,17 @@ import java.util.ArrayList;
 import util.Action;
 import util.Environment;
 import util.Plotter;
+import util.UIHelper;
 
 public class ValueIteration implements Environment{
 	private double[][] utilities;
-	private char[][] policy;
+	private Action[][] policy;
 	private ArrayList<Double> utilityVsIter;
 
 	public ValueIteration() {
-		policy = new char[6][6];
+		policy = new Action[6][6];
 		utilities = new double[6][6];
 		utilityVsIter = new ArrayList<>();
-//		for(int i = 0; i < 6; i++){
-//			for(int j = 0; j < 6; j++)
-//				System.out.print(utilities[i][j] + ",");
-//			System.out.println();
-//		}
 	}
 	
 	public void doValueIteration(){
@@ -28,7 +24,6 @@ public class ValueIteration implements Environment{
 		
 		do{
 			deltaMax = 0;
-//			System.out.println("Epoch: " + epoch);			
 			utilityVsIter.add(utilities[0][0]);
 			
 			for(int i = 0; i < 6; i++){
@@ -42,7 +37,6 @@ public class ValueIteration implements Environment{
 					
 					double deltaCur = Math.abs(utilities[i][j]-newUtilities[i][j]);
 					deltaMax = Math.max(deltaCur, deltaMax);
-//					deltaMin = Math.min(deltaCur, deltaMin);
 				}
 			}
 			
@@ -69,7 +63,7 @@ public class ValueIteration implements Environment{
 	private void findPolicy(){
 		for(int i = 0; i < 6; i++){
 			for(int j = 0; j < 6; j++){
-				policy[i][j] = findBestAction(i,j).symbol;
+				policy[i][j] = findBestAction(i,j);
 			}
 		}
 	}
@@ -97,10 +91,10 @@ public class ValueIteration implements Environment{
 		return horizontal;
 	}
 	private double findUtility(int i, int j, Action action) {
-		double northProb = action.northProb;
-		double westProb = action.westProb;
-		double eastProb = action.eastProb;
-		double southProb = action.southProb;
+		double northProb = action.getNorthProb();
+		double westProb = action.getWestProb();
+		double eastProb = action.getEastProb();
+		double southProb = action.getSouthProb();
 		
 		double northUtility;
 		double westUtility;
@@ -136,23 +130,14 @@ public class ValueIteration implements Environment{
 		ValueIteration valueIter = new ValueIteration();
 		valueIter.doValueIteration();
 		
-		for(int i = 0; i < 6; i++){
-			for(int j = 0; j < 6; j++)
-				System.out.println("(" + i + "," + j + "): " + valueIter.utilities[i][j]);
-		}
+		UIHelper.displayUtilities(valueIter.utilities);
+	
+		System.out.println("Utilities: ");
+		UIHelper.displayUtilitiesGrid(valueIter.utilities);
 		
-		for(int i = 0; i < 6; i++){
-			for(int j = 0; j < 6; j++)
-				System.out.print(valueIter.utilities[i][j] + ",");
-			System.out.println();
-		}
-		
+		System.out.println("Policy: ");
 		valueIter.findPolicy();
-		for(int i = 0; i < 6; i++){
-			for(int j = 0; j < 6; j++)
-				System.out.print(valueIter.policy[i][j] + ",");
-			System.out.println();
-		}
+		UIHelper.displayPolicy(valueIter.policy);
 		
 		Plotter plotter = new Plotter(valueIter.utilityVsIter);
 		plotter.drawGraph();
