@@ -33,7 +33,7 @@ public class Plotter extends JPanel {
         int h = getHeight();
         // Draw ordinate.
         g2.draw(new Line2D.Double(PAD, PAD, PAD, h-PAD));
-        // Draw abcissa.
+        // Draw abscissa.
         g2.draw(new Line2D.Double(PAD, h-PAD, w-PAD, h-PAD));
         // Draw labels.
         Font font = g2.getFont();
@@ -59,13 +59,21 @@ public class Plotter extends JPanel {
         // Draw lines.
         double xInc = (double)(w - 2*PAD)/(data.length-1);
         double scale = (double)(h - 2*PAD)/getMax();
+        
+//        int xInc = (int)((w - 2*PAD)/(data.length-1));
+//        int scale = (int)((h - 2*PAD)/getMax());
         g2.setPaint(Color.green.darker());
         for(int i = 0; i < data.length-1; i++) {
+//        	g2.setPaint(Color.green.darker());
+        	
             double x1 = PAD + i*xInc;
             double y1 = h - PAD - scale*data[i];
             double x2 = PAD + (i+1)*xInc;
             double y2 = h - PAD - scale*data[i+1];
             g2.draw(new Line2D.Double(x1, y1, x2, y2));
+            
+//            g2.setPaint(Color.black);
+//            g2.drawLine(PAD + i*xInc, h-PAD - 5, PAD + i*xInc, h-PAD + 5);
         }
         // Mark data points.
         g2.setPaint(Color.red);
@@ -74,6 +82,7 @@ public class Plotter extends JPanel {
             double y = h - PAD - scale*data[i];
             g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
         }
+        
     }
  
     private double getMax() {

@@ -3,20 +3,25 @@ import java.util.ArrayList;
 
 import util.Action;
 import util.Environment;
-import util.Plotter;
+import util.FileIOHelper;
+//import util.Plotter;
 import util.UIHelper;
 
 public class ValueIteration implements Environment{
 	private double[][] utilities;
 	private Action[][] policy;
-	private ArrayList<Double> utilityVsIter;
+	private ArrayList<double[][]> utilsVsIter;
 
 	public ValueIteration() {
 		policy = new Action[6][6];
 		utilities = new double[6][6];
-		utilityVsIter = new ArrayList<>();
+		utilsVsIter = new ArrayList<double[][]>();
 	}
-	
+		
+	public ArrayList<double[][]> getUtilsVsIter() {
+		return utilsVsIter;
+	}
+
 	public void doValueIteration(){
 		int epoch = 0;
 		double[][] newUtilities = new double[6][6];		
@@ -24,7 +29,11 @@ public class ValueIteration implements Environment{
 		
 		do{
 			deltaMax = 0;
-			utilityVsIter.add(utilities[0][0]);
+			
+			double[][] utilitiesCopy = new double[6][6];
+			for(int i = 0; i < 6; i++)
+				System.arraycopy(utilities[i], 0, utilitiesCopy[i], 0, utilities[i].length);
+			utilsVsIter.add(utilitiesCopy);
 			
 			for(int i = 0; i < 6; i++){
 				for(int j = 0; j < 6; j++){
@@ -46,6 +55,10 @@ public class ValueIteration implements Environment{
 			epoch += 1;
 		} while(deltaMax >= epsilon*(1-gamma)/gamma);
 		
+		double[][] utilitiesCopy = new double[6][6];
+		for(int i = 0; i < 6; i++)
+			System.arraycopy(utilities[i], 0, utilitiesCopy[i], 0, utilities[i].length);
+		utilsVsIter.add(utilitiesCopy);
 		System.out.println("Number of iterations: " + epoch);
 	}
 
@@ -139,7 +152,13 @@ public class ValueIteration implements Environment{
 		valueIter.findPolicy();
 		UIHelper.displayPolicy(valueIter.policy);
 		
-		Plotter plotter = new Plotter(valueIter.utilityVsIter);
-		plotter.drawGraph();
+		FileIOHelper.writeToFile(valueIter.utilsVsIter, "value_iteration_utilities");
+//		Plotter plotter = new Plotter(valueIter.utilsVsIter);
+//		plotter.drawGraph();
+		
+//		System.out.println("Utility vs iter: ");
+//		for(Double d: valueIter.utilsVsIter){
+//			System.out.print(d + " ");
+//		}
 	}
 }

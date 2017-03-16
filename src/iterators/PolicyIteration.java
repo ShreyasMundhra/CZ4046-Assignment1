@@ -3,13 +3,13 @@ import java.util.ArrayList;
 
 import util.Action;
 import util.Environment;
-import util.Plotter;
+import util.FileIOHelper;
 import util.UIHelper;
 
 public class PolicyIteration implements Environment{
 	private Action[][] policy;
 	private double[][] utilities;
-	private ArrayList<Double> utilityVsIter;
+	private ArrayList<double[][]> utilsVsIter;
 	
 	public PolicyIteration() {
 		policy = new Action[6][6];
@@ -22,49 +22,77 @@ public class PolicyIteration implements Environment{
 		}
 		
 		utilities = new double[6][6];
-		utilityVsIter = new ArrayList<>();
+		utilsVsIter = new ArrayList<double[][]>();
 	}
 	
+	public ArrayList<double[][]> getUtilsVsIter() {
+		return utilsVsIter;
+	}
+
+	public Action[][] getPolicy() {
+		return policy;
+	}
+
+	public double[][] getUtilities() {
+		return utilities;
+	}
+
 	public void doPolicyIteration(){
 		int epoch = 0;
 		double[][] newUtilities = new double[6][6];
-		double deltaMax;
+		boolean isUtilUnchanged;
 		
 		do{
-			deltaMax = 0;
-//			System.out.println("Epoch: " + epoch);
-			utilityVsIter.add(utilities[0][0]);
+			isUtilUnchanged = true;
+			
+			double[][] utilitiesCopy = new double[6][6];
+			for(int i = 0; i < 6; i++)
+				System.arraycopy(utilities[i], 0, utilitiesCopy[i], 0, utilities[i].length);
+			utilsVsIter.add(utilitiesCopy);
+			
+			for(int iter = 0; iter < k; iter++){
+				for(int i = 0; i < 6; i++){
+					for(int j = 0; j < 6; j++){
+						if(Environment.maze[i][j] == Environment.WALL){
+							continue;
+						}
+
+						double reward = maze[i][j].reward;
+						Action action = policy[i][j];
+						double futureUtility = findUtility(i,j,action);
+						newUtilities[i][j] = reward + gamma*futureUtility;
+					}
+				}
+				for(int i = 0; i < 6; i++)
+					System.arraycopy(newUtilities[i], 0, utilities[i], 0, utilities[i].length);
+			}
+			
 			for(int i = 0; i < 6; i++){
 				for(int j = 0; j < 6; j++){
-					if(Environment.maze[i][j] == Environment.WALL){
-						continue;
+					double preFutureUtility = findUtility(i,j,policy[i][j]);
+					Action bestAction = findBestAction(i, j);
+					double currFutureUtility = findUtility(i,j,bestAction);
+					
+					if(currFutureUtility > preFutureUtility){
+						policy[i][j] = bestAction;
+						isUtilUnchanged = false;
 					}
-					
-					double reward = maze[i][j].reward;
-					Action action = policy[i][j];
-					double futureUtility = findUtility(i,j,action);
-					newUtilities[i][j] = reward + gamma*futureUtility;
-					
-					double deltaCur = Math.abs(utilities[i][j]-newUtilities[i][j]);
-					deltaMax = Math.max(deltaCur, deltaMax);
-//					deltaMin = Math.min(deltaCur, deltaMin);
 				}
 			}
-			for(int i = 0; i < 6; i++)
-				System.arraycopy(newUtilities[i], 0, utilities[i], 0, utilities[i].length);
-			findPolicy();			
+			
 			epoch += 1;
-		} while(deltaMax >= epsilon*(1-gamma)/gamma);
+		} while(!isUtilUnchanged);
 		
+		double[][] utilitiesCopy = new double[6][6];
+		for(int i = 0; i < 6; i++)
+			System.arraycopy(utilities[i], 0, utilitiesCopy[i], 0, utilities[i].length);
+		utilsVsIter.add(utilitiesCopy);
 		System.out.println("Number of iterations: " + epoch);
 	}
 	
-	private void findPolicy(){
+	public void findPolicy(){
 		for(int i = 0; i < 6; i++){
 			for(int j = 0; j < 6; j++){
-//				if(maze[i][j] == WALL){
-//					continue;
-//				}
 				policy[i][j] = findBestAction(i,j);
 			}
 		}
@@ -141,9 +169,8 @@ public class PolicyIteration implements Environment{
 		System.out.println("Policy: ");
 		policyIter.findPolicy();
 		UIHelper.displayPolicy(policyIter.policy);
-		
-		Plotter plotter = new Plotter(policyIter.utilityVsIter);
-		plotter.drawGraph();
+
+		FileIOHelper.writeToFile(policyIter.utilsVsIter, "policy_iteration_utilities");
 	}
 
 }
