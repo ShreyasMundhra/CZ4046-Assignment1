@@ -153,12 +153,5 @@ public class ValueIteration implements Environment{
 		UIHelper.displayPolicy(valueIter.policy);
 		
 		FileIOHelper.writeToFile(valueIter.utilsVsIter, "value_iteration_utilities");
-//		Plotter plotter = new Plotter(valueIter.utilsVsIter);
-//		plotter.drawGraph();
-		
-//		System.out.println("Utility vs iter: ");
-//		for(Double d: valueIter.utilsVsIter){
-//			System.out.print(d + " ");
-//		}
 	}
 }
